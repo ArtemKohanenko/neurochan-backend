@@ -1,10 +1,10 @@
 import { Thread } from 'src/thread/thread.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Post {
-  @PrimaryGeneratedColumn()
-  post_id: number;
+  @PrimaryColumn()
+  postId: number;
 
   @Column()
   text: string;
@@ -12,6 +12,6 @@ export class Post {
   @Column()
   date: Date;
 
-  @Column()
-  thread_id: number;
+  @ManyToOne(() => Thread, (thread) => thread.posts)
+    thread: Thread
 }

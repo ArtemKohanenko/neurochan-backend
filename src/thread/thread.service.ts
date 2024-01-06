@@ -3,13 +3,14 @@ import { CreateThreadDto } from './dto/create.thread.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Thread } from './thread.entity';
 import { Repository } from 'typeorm';
-import { GetThreadsDto } from './dto/get.threads.dto';
 import { Post } from 'src/post/post.entity';
+
+import { Logger } from '@nestjs/common';
 
 
 @Injectable()
 export class ThreadService {
-    private currentId: number = 0;
+    private static currentId: number = 0;
 
     constructor(
         @InjectRepository(Thread)
@@ -23,28 +24,39 @@ export class ThreadService {
 
     async createThread(threadDto: CreateThreadDto){
         const currentDate = new Date();
-        const thread = await this.threadRepository.create({...threadDto, date: currentDate, lastActivityDate: currentDate, thread_id: this.getCurrentId()})
+        const thread = await this.threadRepository.create({...threadDto, date: currentDate, lastActivityDate: currentDate, threadId: this.getCurrentId()})
         await this.threadRepository.save(thread);
-        return thread
+        return { data: thread }
     }
 
-    async getTopThreads(params: GetThreadsDto){
+    async getTopThreads(number: number){
         const threads = await this.threadRepository.createQueryBuilder()
+        .leftJoinAndSelect("Thread.posts", "Post")
         .orderBy("Thread.lastActivityDate", "DESC")
-        .take(params.threadsNumber)
+        .take(number)
         .getMany();
-        return threads
+
+        const threadsWithLastPosts =  threads.map((el) => {
+            return {...el, lastPosts: el.posts.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 3)}
+        })
+
+        const threadsRes = threadsWithLastPosts.map((el) => {
+            return {...el, posts: el.posts.map((post) => post.postId)}
+        })
+        
+        return { data: threadsRes }
     }
 
     public getCurrentId() {
-        this.currentId++;
-        return this.currentId;
+        ThreadService.currentId++;
+        return ThreadService.currentId;
     }
 
     private async initCurrentId() {
-        const maxThreadId = (await this.threadRepository.createQueryBuilder().select("MAX(Thread.thread_id)", "max").getRawOne()).max
-        const maxPostId = (await this.postRepository.createQueryBuilder().select("MAX(Post.post_id)", "max").getRawOne()).max
+        const maxThreadId = (await this.threadRepository.createQueryBuilder().select("MAX(Thread.threadId)", "max").getRawOne()).max
+        const maxPostId = (await this.postRepository.createQueryBuilder().select("MAX(Post.postId)", "max").getRawOne()).max
         let maxId;
+
         if (maxThreadId && maxPostId) {
             maxId = Math.max(maxThreadId, maxPostId)
         }
@@ -58,6 +70,6 @@ export class ThreadService {
             maxId = 0
         }
         
-        this.currentId = maxId
+        ThreadService.currentId = maxId
     }
 }

@@ -1,10 +1,10 @@
 import { Post } from 'src/post/post.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class Thread {
-  @PrimaryGeneratedColumn()
-  thread_id: number;
+  @PrimaryColumn()
+  threadId: number;
 
   @Column()
   text: string;
@@ -15,6 +15,6 @@ export class Thread {
   @Column()
   lastActivityDate: Date;
 
-  @OneToMany(type => Post, post => post.thread_id)
+  @OneToMany(() => Post, (post) => post.thread)
   posts: Post[];
 }

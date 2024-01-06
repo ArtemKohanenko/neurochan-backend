@@ -8,6 +8,7 @@ import { Post } from 'src/post/post.entity';
 @Module({
   controllers: [ThreadController],
   providers: [ThreadService],
-  imports: [TypeOrmModule.forFeature([Thread, Post])]
+  imports: [TypeOrmModule.forFeature([Thread, Post])],
+  exports: [ThreadService]
 })
 export class ThreadModule {}

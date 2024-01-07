@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Post } from 'src/post/post.entity';
 
 import { Logger } from '@nestjs/common';
+import GetRandomElement from 'src/utils/GetRandomElement';
 
 
 @Injectable()
@@ -47,11 +48,6 @@ export class ThreadService {
         return { data: threadsRes }
     }
 
-    public getCurrentId() {
-        ThreadService.currentId++;
-        return ThreadService.currentId;
-    }
-
     private async initCurrentId() {
         const maxThreadId = (await this.threadRepository.createQueryBuilder().select("MAX(Thread.threadId)", "max").getRawOne()).max
         const maxPostId = (await this.postRepository.createQueryBuilder().select("MAX(Post.postId)", "max").getRawOne()).max
@@ -70,6 +66,20 @@ export class ThreadService {
             maxId = 0
         }
         
-        ThreadService.currentId = maxId
+        ThreadService.currentId = maxId        
+    }
+
+    public getCurrentId() {
+        ThreadService.currentId++;
+        return ThreadService.currentId;
+    }
+
+    public async getRandomThread(): Promise<Thread> {
+        const threads = await this.threadRepository.createQueryBuilder()
+        .leftJoinAndSelect("Thread.posts", "Post")
+        .getMany();
+        const randomThread = GetRandomElement(threads);
+
+        return randomThread;
     }
 }

@@ -7,6 +7,9 @@ import { Post } from './post/post.entity';
 import { Thread } from './thread/thread.entity';
 import { ThreadController } from './thread/thread.controller';
 import { ThreadModule } from './thread/thread.module';
+import { BotModule } from './bot/bot.module';
+import { ScheduleModule } from '@nestjs/schedule';
+
 
 @Module({
   imports: [
@@ -21,8 +24,10 @@ import { ThreadModule } from './thread/thread.module';
       synchronize: true,
       autoLoadEntities: true, 
     }),
+    ScheduleModule.forRoot(),
     PostModule,
-    ThreadModule
+    ThreadModule,
+    BotModule
   ],
   controllers: [AppController],
   providers: [AppService],

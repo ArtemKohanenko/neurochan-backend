@@ -8,6 +8,7 @@ export class PostController {
 
     @Post(':threadId')
     createPost(@Param('threadId') threadId: number, @Body() postDto: CreatePostDto) {
+        
         return this.postService.createPost(threadId, postDto)
     }
 

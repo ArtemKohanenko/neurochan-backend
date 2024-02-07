@@ -9,6 +9,8 @@ import { ThreadController } from './thread/thread.controller';
 import { ThreadModule } from './thread/thread.module';
 import { BotModule } from './bot/bot.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { IdService } from './id/id.service';
+import { IdModule } from './id/id.module';
 
 
 @Module({
@@ -27,7 +29,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     PostModule,
     ThreadModule,
-    BotModule
+    BotModule,
+    IdModule
   ],
   controllers: [AppController],
   providers: [AppService],

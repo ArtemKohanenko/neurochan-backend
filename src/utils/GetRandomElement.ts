@@ -1,3 +1,5 @@
-const GetRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const pow = (number) => number*number
+
+const GetRandomElement = (arr) => arr[Math.floor((1 - pow(Math.random())) * arr.length)];
 
 export default GetRandomElement

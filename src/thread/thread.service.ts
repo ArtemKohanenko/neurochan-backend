@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { CreateThreadDto } from './dto/create.thread.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Thread } from './thread.entity';
@@ -7,26 +7,30 @@ import { Post } from 'src/post/post.entity';
 
 import { Logger } from '@nestjs/common';
 import GetRandomElement from 'src/utils/GetRandomElement';
+import { BotService } from 'src/bot/bot.service';
+import { IdService } from 'src/id/id.service';
 
 
 @Injectable()
 export class ThreadService {
-    private static currentId: number = 0;
 
     constructor(
+        private readonly idService: IdService,
+        private readonly botService: BotService,
         @InjectRepository(Thread)
-        private threadRepository: Repository<Thread>,
-        @InjectRepository(Post)
-        private postRepository: Repository<Post>
+        private threadRepository: Repository<Thread>
     )
-    {
-        this.initCurrentId()
-    }
+    {}
 
     async createThread(threadDto: CreateThreadDto){
         const currentDate = new Date();
-        const thread = await this.threadRepository.create({...threadDto, date: currentDate, lastActivityDate: currentDate, threadId: this.getCurrentId()})
+        const thread = await this.threadRepository.create({...threadDto, date: currentDate, lastActivityDate: currentDate, threadId: this.idService.getCurrentId()})
         await this.threadRepository.save(thread);
+
+        if (threadDto.isRequireReply) {
+            this.botService.replyOnPost(thread.threadId);
+        }
+
         return { data: thread }
     }
 
@@ -46,40 +50,5 @@ export class ThreadService {
         })
         
         return { data: threadsRes }
-    }
-
-    private async initCurrentId() {
-        const maxThreadId = (await this.threadRepository.createQueryBuilder().select("MAX(Thread.threadId)", "max").getRawOne()).max
-        const maxPostId = (await this.postRepository.createQueryBuilder().select("MAX(Post.postId)", "max").getRawOne()).max
-        let maxId;
-
-        if (maxThreadId && maxPostId) {
-            maxId = Math.max(maxThreadId, maxPostId)
-        }
-        else if (!maxThreadId && maxPostId) {
-            maxId = maxPostId
-        }
-        else if (maxThreadId && !maxPostId) {
-            maxId = maxThreadId
-        }
-        else {
-            maxId = 0
-        }
-        
-        ThreadService.currentId = maxId        
-    }
-
-    public getCurrentId() {
-        ThreadService.currentId++;
-        return ThreadService.currentId;
-    }
-
-    public async getRandomThread(): Promise<Thread> {
-        const threads = await this.threadRepository.createQueryBuilder()
-        .leftJoinAndSelect("Thread.posts", "Post")
-        .getMany();
-        const randomThread = GetRandomElement(threads);
-
-        return randomThread;
     }
 }

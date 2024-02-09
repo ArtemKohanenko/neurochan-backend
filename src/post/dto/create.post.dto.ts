@@ -6,4 +6,7 @@ export class CreatePostDto{
 
     @ApiProperty({example: true, description: 'Должен ли бот сразу ответить на пост'})
     readonly isRequireReply?: boolean
+
+    @ApiProperty({example: 'A6DB4', description: 'Текст решенной капчи'})
+    readonly captchaValue: string
 }

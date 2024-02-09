@@ -1,4 +1,5 @@
-import { ConsoleLogger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module  } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ThreadController } from './thread.controller';
 import { ThreadService } from './thread.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,7 +13,7 @@ import { IdModule } from 'src/id/id.module';
 @Module({
   controllers: [ThreadController],
   providers: [ThreadService],
-  imports: [TypeOrmModule.forFeature([Thread]), IdModule, BotModule],
+  imports: [TypeOrmModule.forFeature([Thread]), IdModule, BotModule, HttpModule],
   exports: [ThreadService]
 })
 export class ThreadModule {}

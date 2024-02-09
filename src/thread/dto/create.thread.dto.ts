@@ -6,4 +6,7 @@ export class CreateThreadDto{
 
     @ApiProperty({example: true, description: 'Должен ли бот сразу ответить в тред'})
     readonly isRequireReply?: boolean
+
+    @ApiProperty({example: 'A6DB4', description: 'Текст решенной капчи'})
+    readonly captchaValue: string
 }

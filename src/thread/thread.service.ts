@@ -23,6 +23,9 @@ export class ThreadService {
     {}
 
     async createThread(threadDto: CreateThreadDto){
+
+
+
         const currentDate = new Date();
         const thread = await this.threadRepository.create({...threadDto, date: currentDate, lastActivityDate: currentDate, threadId: this.idService.getCurrentId()})
         await this.threadRepository.save(thread);

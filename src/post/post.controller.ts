@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreatePostDto } from './dto/create.post.dto';
 import { PostService } from './post.service';
-import { CaptchaGuard } from 'src/guards/captcha.guard';
+import { CaptchaGuard } from 'src/thread/captcha.guard';
 
 @Controller('post')
 export class PostController {

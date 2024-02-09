@@ -10,11 +10,12 @@ import { BotService } from 'src/bot/bot.service';
 import { BotModule } from 'src/bot/bot.module';
 import { IdService } from 'src/id/id.service';
 import { IdModule } from 'src/id/id.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   controllers: [PostController],
   providers: [PostService],
-  imports: [TypeOrmModule.forFeature([Thread, Post]), IdModule, BotModule],
+  imports: [TypeOrmModule.forFeature([Thread, Post]), IdModule, BotModule, HttpModule],
   exports: [PostService]
 })
 export class PostModule {}
